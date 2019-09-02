@@ -1,4 +1,8 @@
-import indexApi from './apiList/index';
+import allianceApi from './apiList/alliance'; //联盟
+import GameApi from './apiList/game'; //比赛
+import TeamApi from './apiList/team'; //球队
 export default {
-    indexApi,
+    allianceApi,
+    GameApi,
+    TeamApi
 }

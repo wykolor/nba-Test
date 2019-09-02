@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-import Home from "../views/Home"
+// 联盟
+import Alliance from "../views/Alliance"
 
 Vue.use(Router)
 // 挂载页面路由文件
@@ -16,8 +16,8 @@ const router = new Router({
     // },
     routes: [{
         path: '/',
-        name: 'home',
-        component: Home
+        name: 'alliance',
+        component: Alliance
     }]
 });
 // 路由守卫 全部配置  在每个路由页面进入的时候，判断是否登录--权限配置

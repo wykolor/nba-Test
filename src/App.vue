@@ -11,23 +11,22 @@
 <script>
 // 暴露组件
 export default {
-  name: 'App',
-  components:{
-  }
-}
+  name: "App",
+  components: {}
+};
 </script>
 
 <style>
-@import './less/reset.less';
-@import './assets/icon/iconfont.css';
+@import "./less/reset.less";
+@import "./assets/icon/iconfont.css";
 </style>
 <style>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #5B5859;
-    font-size:1rem;
-    min-height: 100%;
-  }
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #5b5859;
+  font-size: 1rem;
+  min-height: 100%;
+}
 </style>
