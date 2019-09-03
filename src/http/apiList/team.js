@@ -2,11 +2,11 @@ import {
     get,
     post
 } from '../http';
-// 查询比赛
+// 查询球队
 let getTeamUrl = '/nba/team/list';
-// 增加比赛
+// 增加球队
 let addTeamUrl = '/nba/team/add';
-// 修改比赛
+// 修改球队
 let updateTeamUrl = '/nba/team/update';
 export default {
     getTeamAddress: function (getTeamObj) {

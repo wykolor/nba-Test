@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <el-container>
-      <el-header>NBA计分统计系统</el-header>
+      <el-header>篮球计分统计系统</el-header>
       <div class="nba-content">
         <el-menu
           :default-active="activeIndex"
@@ -41,15 +41,15 @@ export default {
       tabList: [
         {
           path: "alliance",
-          tip: "NBA联盟"
+          tip: "联盟"
         },
         {
           path: "team",
-          tip: "NBA球队"
+          tip: "球队"
         },
         {
           path: "game",
-          tip: "NBA比赛"
+          tip: "比赛"
         }
       ]
     };

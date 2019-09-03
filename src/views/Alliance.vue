@@ -2,39 +2,36 @@
   <div class="alliance">
     <!-- 头部 -->
     <div class="alli-header">
-      <el-button type="Info" icon="el-icon-plus" @click="addAlliance()">添加</el-button>
+      <el-button type="Info" icon="el-icon-plus" @click="addAlliance()">添加联盟</el-button>
       <section>
-        <el-input placeholder="输入联盟关键字查询" prefix-icon="el-icon-search" v-model="searchAlliance"></el-input>
+        <el-input
+          placeholder="输入联盟关键字查询"
+          prefix-icon="el-icon-search"
+          v-model="searchValue"
+          @change="serachAlliance"
+        ></el-input>
       </section>
     </div>
     <div class="ali-list">
       <el-row :gutter="20">
         <el-col :span="4" v-for="item in allianceList" :key="item.id">
-          <el-card :body-style="{ padding: '0px' }">
-            <!-- <img src="https://element.eleme.cn/2.0/static/hamburger.50e4091.png" class="image" /> -->
-            <div style="padding: 14px;">
-              <span>{{item.allianceName}}</span>
-              <div class="bottom clearfix">
-                <!-- <time class="time">{{ currentDate }}</time> -->
-                <el-button type="text" class="button">更新联盟</el-button>
+          <el-card :body-style="{ padding: '0px' }" shadow="hover">
+            <img
+              src="https://australia.basketball/wp-content/uploads/2018/09/OgImage_en.png"
+              class="image"
+            />
+            <div style="padding: 14px 0;text-align:center">
+              <span style="font-size:20px;font-weight: bold;">{{item.allianceName}}</span>
+              <div class="bottom">
+                <el-tag @click="goTeam(item.id)">球队</el-tag>
+                <el-tag type="success" @click="goGame(item.id)">比赛</el-tag>
+                <el-tag type="warning" @click="updateAlliance(item.allianceName,item.id)">更新联盟</el-tag>
               </div>
             </div>
           </el-card>
         </el-col>
       </el-row>
     </div>
-    <!-- <h1>联盟</h1>
-    <section>
-      <el-button size="small" @click="addAlliance()">新增联盟</el-button>
-      <el-tabs v-model="activeName" type="card">
-        <el-tab-pane
-          :label="item.allianceName"
-          :name="`${index}`"
-          v-for="(item,index) in allianceList"
-          :key="item.id"
-        >{{item.allianceName}}</el-tab-pane>
-      </el-tabs> 
-    </section>-->
   </div>
 </template>
 
@@ -43,20 +40,10 @@ import Game from "./Game";
 export default {
   data() {
     return {
-      allianceList: [
-        { allianceName: "NBA", id: "alliance" },
-        { allianceName: "NBA", id: "alliance1" },
-        { allianceName: "CBA", id: "cba" },
-        { allianceName: "DBA", id: "dba" },
-        { allianceName: "BBC", id: "bbc" },
-        { allianceName: "CBA", id: "cba2" },
-        { allianceName: "DBA", id: "dba3" },
-        { allianceName: "BBC", id: "bbc4" }
-      ], //联盟列表
+      allianceList: [], //联盟列表
       activeName: "0",
       activeIndex2: "1",
-      searchAlliance: "",
-      currentDate: new Date()
+      searchValue: ""
     };
   },
   components: {
@@ -80,16 +67,30 @@ export default {
           }
         });
     },
+    // 搜索联盟
+    serachAlliance() {
+      this.$server.allianceApi
+        .getAllianceAddress({
+          pageSize: 10,
+          pageIndex: 1,
+          companyName: this.searchValue
+        })
+        .then(res => {
+          if (res.code == 200) {
+            this.allianceList = res.data.data;
+          }
+        });
+    },
     //添加联盟
     addAlliance() {
       this.$prompt("请输入需要增加的联盟名字", "新增联盟", {
         confirmButtonText: "确认",
         cancelButtonText: "取消"
       })
-        .then(({ allianceName }) => {
+        .then(({ value }) => {
           this.$server.allianceApi
             .addAllianceAddress({
-              allianceName
+              allianceName: value
             })
             .then(res => {
               if (res.code == 200) {
@@ -97,6 +98,7 @@ export default {
                   type: "success",
                   message: "添加联盟成功"
                 });
+                this.getAlliance();
               }
             });
         })
@@ -107,21 +109,41 @@ export default {
           });
         });
     },
-    removeTab(targetName) {
-      let tabs = this.allianceList;
-      let activeName = this.activeName;
-      if (activeName === targetName) {
-        tabs.forEach((tab, index) => {
-          if (tab.name === targetName) {
-            let nextTab = tabs[index + 1] || tabs[index - 1];
-            if (nextTab) {
-              activeName = nextTab.name;
-            }
-          }
+    // 更新联盟
+    updateAlliance(oldAlliance, id) {
+      this.$prompt("请输入需要更新的联盟名字", `原始联盟：${oldAlliance}`, {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消"
+      })
+        .then(({ value }) => {
+          this.$server.allianceApi
+            .updateAllianceAddress({
+              id,
+              allianceName: value
+            })
+            .then(res => {
+              if (res.code == 200) {
+                this.$message({
+                  type: "success",
+                  message: "更新联盟成功"
+                });
+                this.getAlliance();
+              }
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消更新联盟"
+          });
         });
-      }
-      this.activeName = activeName;
-      this.allianceList = tabs.filter(tab => tab.name !== targetName);
+    },
+    // 去到球队
+    goTeam(companyId) {
+      this.$router.push({ path: "/team", query: { companyId } });
+    },
+    goGame(companyId) {
+      this.$router.push({ path: "/game", query: { companyId } });
     }
   }
 };
@@ -147,14 +169,15 @@ export default {
   }
   .ali-list {
     padding: 20px 40px 10px;
-    .time {
-      font-size: 13px;
-      color: #999;
+    .el-col-4 {
+      margin-bottom: 20px;
     }
-
     .bottom {
       margin-top: 13px;
       line-height: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
     }
 
     .button {
