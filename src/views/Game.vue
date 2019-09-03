@@ -20,4 +20,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.game {
+  background-color: #fff;
+}
 </style>

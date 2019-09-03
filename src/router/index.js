@@ -1,7 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Home from '../views/Home'
 // 联盟
-import Alliance from "../views/Alliance"
+import Alliance from "../views/Alliance";
+// 球队
+import Team from "../views/Team";
+// 比赛
+import Game from "../views/Game";
 
 Vue.use(Router)
 // 挂载页面路由文件
@@ -14,11 +19,28 @@ const router = new Router({
     //     return { x: 0, y: 0 } //保证每次进入页面都是在页面的顶部
     //   }
     // },
-    routes: [{
-        path: '/',
-        name: 'alliance',
-        component: Alliance
-    }]
+    routes: [
+        {
+            path: '/',
+            name: 'home',
+            component: Home,
+            redirect:'/alliance',
+            children: [
+                {
+                    path: 'alliance',
+                    component:Alliance
+                },
+                {
+                    path: 'team',
+                    component:Team
+                },
+                {
+                    path: 'game',
+                    component:Game
+                },
+            ]
+        }
+    ]
 });
 // 路由守卫 全部配置  在每个路由页面进入的时候，判断是否登录--权限配置
 router.beforeEach((to, from, next) => {
