@@ -33,13 +33,16 @@
         ></el-input>
       </section>
     </div>
-    <div class="team-list">
+    <div class="team-list" v-loading="loading">
       <el-row :gutter="15">
         <el-col :span="4" v-for="item in teamLists" :key="item.id">
           <el-card :body-style="{ padding: '0px' }" shadow="hover">
             <div style="padding: 14px 0;text-align:center">
               <i class="el-icon-basketball"></i>
               <span style="font-size:20px;font-weight: bold;">{{item.teamName}}</span>
+              <span
+                style="display:block;line-height:34px;color:rgb(133, 133, 133);;"
+              >{{item.allianceName}}</span>
               <div class="bottom">
                 <el-tag type="success">比赛</el-tag>
                 <el-tag type="warning">更新球队</el-tag>
@@ -63,28 +66,32 @@ export default {
         teamName: "",
         commpanyId: "",
         delivery: false,
-        allianceList: []
+        allianceList: this.$store.getters.allianceList
       },
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
+      loading: true
     };
   },
   created() {
+    this.$store.commit("changeActiveTab", this.$route.path);
     this.getTeam();
   },
   methods: {
     teamList() {
-      let id = this.$route.query.companyId;
-      let companyId = id ? id : "";
+      let id = this.$route.query.allianceId;
+      let allianceId = id ? id : "";
       this.$server.teamApi
         .getTeamAddress({
           pageSize: 10,
           pageIndex: 1,
           teamName: this.searchValue,
-          companyId
+          allianceId
         })
         .then(res => {
           if (res.code == 200) {
+            this.loading = false;
             this.teamLists = res.data.data;
+            this.$store.commit("changeTeam", this.teamLists);
           }
         });
     },
@@ -108,19 +115,20 @@ export default {
     },
     // 查询球队
     serachTeam() {
+      this.loading = true;
       this.teamList();
     },
     // 打开弹出窗
     openPopup() {
       this.dialogFormVisible = true;
-      this.getAlliance();
+      // this.getAlliance();
     },
     // 真正的添加球队业务逻辑
     addTeam() {
       this.$server.teamApi
         .addTeamAddress({
           teamName: this.form.teamName,
-          companyId: this.form.commpanyId
+          allianceId: this.form.commpanyId
         })
         .then(res => {
           if (res.code == 200) {
@@ -139,7 +147,6 @@ export default {
 
 <style lang="less" scoped>
 .team {
-  background-color: #fff;
   width: 100%;
   box-sizing: border-box;
   background-color: #fff;

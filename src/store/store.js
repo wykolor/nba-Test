@@ -3,13 +3,34 @@ import Vuex from 'vuex'
 Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
-        networkSuccess: true, //true为联网成功，false为断网
-        openid: null,
-        version:"1.18.0"
+        alliance: [], //联盟列表
+        team: [], //球队列表
+        game: [], //比赛列表
+        tabActive: "/alliance"
+    },
+    getters: {
+        allianceList(state) {
+            return state.alliance;
+        },
+        teamList(state) {
+            return state.team;
+        },
+        gameList(state) {
+            return state.game;
+        },
     },
     mutations: {
-        changeNetworkSuccess(state, val) { //改变状态
-            state.networkSuccess = val
+        changeAlliance(state, alliance) {
+            state.alliance = alliance;
+        },
+        changeTeam(state, team) {
+            state.team = team;
+        },
+        changeGame(state, game) {
+            state.game = game;
+        },
+        changeActiveTab(state, active) {
+            state.tabActive = active;
         }
     }
 })

@@ -12,7 +12,7 @@
         ></el-input>
       </section>
     </div>
-    <div class="ali-list">
+    <div class="ali-list" v-loading="loading">
       <el-row :gutter="20">
         <el-col :span="4" v-for="item in allianceList" :key="item.id">
           <el-card :body-style="{ padding: '0px' }" shadow="hover">
@@ -43,7 +43,8 @@ export default {
       allianceList: [], //联盟列表
       activeName: "0",
       activeIndex2: "1",
-      searchValue: ""
+      searchValue: "",
+      loading: true
     };
   },
   components: {
@@ -53,22 +54,7 @@ export default {
     this.getAlliance();
   },
   methods: {
-    //   获得联盟
-    getAlliance() {
-      this.$server.allianceApi
-        .getAllianceAddress({
-          pageSize: 10,
-          pageIndex: 1,
-          companyName: ""
-        })
-        .then(res => {
-          if (res.code == 200) {
-            this.allianceList = res.data.data;
-          }
-        });
-    },
-    // 搜索联盟
-    serachAlliance() {
+    allianceLists() {
       this.$server.allianceApi
         .getAllianceAddress({
           pageSize: 10,
@@ -77,9 +63,20 @@ export default {
         })
         .then(res => {
           if (res.code == 200) {
+            this.loading = false;
             this.allianceList = res.data.data;
+            this.$store.commit("changeAlliance", this.allianceList);
           }
         });
+    },
+    //   获得联盟
+    getAlliance() {
+      this.allianceLists();
+    },
+    // 搜索联盟
+    serachAlliance() {
+      this.loading = true;
+      this.allianceLists();
     },
     //添加联盟
     addAlliance() {
@@ -139,11 +136,11 @@ export default {
         });
     },
     // 去到球队
-    goTeam(companyId) {
-      this.$router.push({ path: "/team", query: { companyId } });
+    goTeam(allianceId) {
+      this.$router.push({ path: "/team", query: { allianceId } });
     },
-    goGame(companyId) {
-      this.$router.push({ path: "/game", query: { companyId } });
+    goGame(allianceId) {
+      this.$router.push({ path: "/game", query: { allianceId } });
     }
   }
 };

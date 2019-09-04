@@ -23,7 +23,7 @@
         <router-view></router-view>
       </div>
 
-      <!-- <el-footer>Footer</el-footer> -->
+      <el-footer>@CopyRight &copy;2019-present WY-KOLOR</el-footer>
     </el-container>
   </div>
 </template>
@@ -37,18 +37,18 @@ export default {
   },
   data() {
     return {
-      activeIndex: "alliance",
+      // activeIndex: "alliance",
       tabList: [
         {
-          path: "alliance",
+          path: "/alliance",
           tip: "联盟"
         },
         {
-          path: "team",
+          path: "/team",
           tip: "球队"
         },
         {
-          path: "game",
+          path: "/game",
           tip: "比赛"
         }
       ]
@@ -57,6 +57,11 @@ export default {
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
+    }
+  },
+  computed: {
+    activeIndex() {
+      return this.$store.state.tabActive;
     }
   }
 };
