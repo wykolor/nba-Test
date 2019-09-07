@@ -1,34 +1,47 @@
 <template>
   <div class="game">
     <div class="game-header">
-      <el-button type="Info" icon="el-icon-plus" @click="openPopup">添加比赛</el-button>
+      <el-button type="Info" icon="el-icon-plus" @click="openPopup('添加比赛')">添加比赛</el-button>
       <!-- 添加弹窗 -->
-      <el-dialog title="新增比赛" :visible.sync="addShow">
+      <el-dialog :title="popupTitle" :visible.sync="addShow">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" :inline="true">
           <el-form-item label="主队">
-            <el-select v-model="ruleForm.zhuTeamId" placeholder="请选择主队名称">
+            <el-select v-model="ruleForm.zhuTeam" placeholder="请选择主队名称">
               <el-option
                 :label="zhu.teamName"
-                :value="zhu.id"
+                :value="zhu.teamName"
                 v-for="zhu in teamList"
                 :key="zhu.id"
               ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="客队">
-            <el-select v-model="ruleForm.keTeamId" placeholder="请选择客队名称">
-              <el-option :label="ke.teamName" :value="ke.id" v-for="ke in teamList" :key="ke.id"></el-option>
+            <el-select v-model="ruleForm.keTeam" placeholder="请选择客队名称">
+              <el-option
+                :label="ke.teamName"
+                :value="ke.teamName"
+                v-for="ke in teamList"
+                :key="ke.id"
+              ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="联盟名称">
-            <el-select v-model="ruleForm.allianceId" placeholder="请选择联盟名称">
+            <el-select v-model="ruleForm.allianceName" placeholder="请选择联盟名称">
               <el-option
                 :label="alli.allianceName"
-                :value="alli.id"
+                :value="alli.allianceName"
                 v-for="alli in allianceList"
                 :key="alli.id"
               ></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item label="比赛时间">
+            <el-date-picker
+              type="date"
+              placeholder="选择日期"
+              v-model="ruleForm.gameTime"
+              style="width: 100%;"
+            ></el-date-picker>
           </el-form-item>
           <el-form-item label="第一节比分">
             <el-input v-model="ruleForm.firstScore"></el-input>
@@ -48,7 +61,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="addShow = false">取 消</el-button>
-          <el-button type="primary" @click="addGame">确 定</el-button>
+          <el-button type="primary" @click="addUpdate">确 定</el-button>
         </div>
       </el-dialog>
       <section>
@@ -60,7 +73,7 @@
         ></el-input>
       </section>
     </div>
-    <div class="game-list">
+    <div class="game-list" v-loading="loading">
       <el-table :data="gameLists" border style="width: 100%">
         <el-table-column label="主场VS客场" align="center">
           <template slot-scope="scope">
@@ -77,17 +90,29 @@
         <el-table-column prop="allScore" label="总比分" align="center"></el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button size="mini" @click="openPopup('编辑比赛',scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
+    </div>
+    <div class="game-page">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 15, 20]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      ></el-pagination>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import { parse } from "path";
 export default {
   data() {
     return {
@@ -97,17 +122,26 @@ export default {
       addShow: false,
       ruleForm: {
         keTeamId: "",
+        keTeam: "",
         zhuTeamId: "",
+        zhuTeam: "",
         allianceId: "",
+        allianceName: "",
         firstScore: "",
         secondScore: "",
         thirdScore: "",
         forthScore: "",
-        allScore: ""
+        allScore: "",
+        gameTime: "",
+        id: ""
       },
       rules: {
         keTeamId: [{ required: true, message: "必填内容", trigger: "change" }]
-      }
+      },
+      popupTitle: "添加比赛",
+      total: null,
+      pageSize: 10,
+      currentPage: 1
     };
   },
   created() {
@@ -123,14 +157,15 @@ export default {
       let allianceId = id ? id : "";
       this.$server.gameApi
         .getGameAddress({
-          pageSize: 10,
-          pageIndex: 1,
+          pageSize: this.pageSize,
+          pageIndex: this.currentPage,
           gameName: this.searchValue,
           allianceId
         })
         .then(res => {
           if (res.code == 200) {
             this.loading = false;
+            this.total = res.data.total;
             this.gameLists = res.data.data;
             this.$store.commit("changeGame", this.gameLists);
           }
@@ -142,9 +177,37 @@ export default {
     serachGame() {
       this.gameList();
     },
-    openPopup() {
+    openPopup(title, row) {
+      this.popupTitle = title;
       this.addShow = true;
+      if (row) {
+        this.ruleForm = row;
+      }
     },
+
+    addUpdate() {
+      this.allianceList.forEach(item => {
+        if (this.ruleForm.allianceName == item.allianceName) {
+          this.ruleForm.allianceId = item.id;
+          return false;
+        }
+      });
+      this.teamList.forEach(item => {
+        if (this.ruleForm.zhuTeam == item.teamName) {
+          this.ruleForm.zhuTeamId = item.id;
+        } else if (this.ruleForm.keTeam == item.teamName) {
+          this.ruleForm.keTeamId = item.id;
+        }
+      });
+      // (this.ruleForm.gameTime);
+      debugger;
+      if (!this.ruleForm.id) {
+        this.addGame();
+      } else {
+        this.updateGame();
+      }
+    },
+    // 添加比赛
     addGame() {
       let params = { ...this.ruleForm };
       this.$server.gameApi.addGameAddress(params).then(res => {
@@ -158,8 +221,18 @@ export default {
         }
       });
     },
-    handleEdit(row) {
-      console.log(row);
+    updateGame() {
+      let params = { ...this.ruleForm };
+      this.$server.gameApi.updateGameAddress(params).then(res => {
+        if (res.code == 200) {
+          this.$message({
+            type: "success",
+            message: "修改比赛成功"
+          });
+          this.addShow = false;
+          this.gameList();
+        }
+      });
     },
     handleDelete(id) {
       this.$confirm("此操作将永久删除该比赛, 是否继续?", "提示", {
@@ -184,6 +257,16 @@ export default {
             message: "已取消删除"
           });
         });
+    },
+    handleSizeChange(val) {
+      this.loading = true;
+      this.pageSize = val;
+      this.gameList();
+    },
+    handleCurrentChange(val) {
+      this.loading = true;
+      this.currentPage = val;
+      this.gameList();
     }
   }
 };
@@ -208,6 +291,10 @@ export default {
   }
   .game-list {
     padding: 20px 40px 10px;
+  }
+  .game-page {
+    text-align: center;
+    padding: 20px 40px;
   }
 }
 </style>

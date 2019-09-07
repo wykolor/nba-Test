@@ -35,6 +35,17 @@
         </el-col>
       </el-row>
     </div>
+    <div class="ali-page">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 15, 20]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      ></el-pagination>
+    </div>
   </div>
 </template>
 
@@ -45,9 +56,11 @@ export default {
     return {
       allianceList: [], //联盟列表
       activeName: "0",
-      activeIndex2: "1",
       searchValue: "",
-      loading: true
+      loading: true,
+      total: null,
+      currentPage: 1,
+      pageSize: 10
     };
   },
   components: {
@@ -60,13 +73,14 @@ export default {
     allianceLists() {
       this.$server.allianceApi
         .getAllianceAddress({
-          pageSize: 20,
-          pageIndex: 1,
+          pageSize: this.pageSize,
+          pageIndex: this.currentPage,
           companyName: this.searchValue
         })
         .then(res => {
           if (res.code == 200) {
             this.loading = false;
+            this.total = res.data.total;
             this.allianceList = res.data.data;
             this.$store.commit("changeAlliance", this.allianceList);
           }
@@ -169,6 +183,21 @@ export default {
     },
     goGame(allianceId) {
       this.$router.push({ path: "/game", query: { allianceId } });
+    },
+    handleSizeChange(val) {
+      this.loading = true;
+      this.pageSize = val;
+      this.getAlliance();
+    },
+    handleCurrentChange(val) {
+      this.loading = true;
+      this.currentPage = val;
+      this.getAlliance();
+    }
+  },
+  computed: {
+    totalPage() {
+      return Math.ceil(this.total / this.pageSize);
     }
   }
 };
@@ -224,6 +253,10 @@ export default {
     .clearfix:after {
       clear: both;
     }
+  }
+  .ali-page {
+    text-align: center;
+    padding: 20px 40px;
   }
 }
 </style>

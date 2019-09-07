@@ -53,6 +53,17 @@
         </el-col>
       </el-row>
     </div>
+    <div class="team-page">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 15, 20]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      ></el-pagination>
+    </div>
   </div>
 </template>
 
@@ -72,7 +83,10 @@ export default {
       },
       formLabelWidth: "120px",
       loading: true,
-      popupTitle: "添加球队"
+      popupTitle: "添加球队",
+      total: null,
+      currentPage: 1,
+      pageSize: 10
     };
   },
   created() {
@@ -85,14 +99,15 @@ export default {
       let allianceId = id ? id : "";
       this.$server.teamApi
         .getTeamAddress({
-          pageSize: 20,
-          pageIndex: 1,
+          pageSize: this.pageSize,
+          pageIndex: this.currentPage,
           teamName: this.searchValue,
           allianceId
         })
         .then(res => {
           if (res.code == 200) {
             this.loading = false;
+            this.total = res.data.total;
             this.teamLists = res.data.data;
             this.$store.commit("changeTeam", this.teamLists);
           }
@@ -220,6 +235,21 @@ export default {
             message: "已取消删除"
           });
         });
+    },
+    handleSizeChange(val) {
+      this.loading = true;
+      this.pageSize = val;
+      this.teamList();
+    },
+    handleCurrentChange(val) {
+      this.loading = true;
+      this.currentPage = val;
+      this.teamList();
+    }
+  },
+  computed: {
+    totalPage() {
+      return Math.ceil(this.total / this.pageSize);
     }
   }
 };
@@ -257,6 +287,10 @@ export default {
       align-items: center;
       justify-content: space-around;
     }
+  }
+  .team-page {
+    text-align: center;
+    padding: 20px 40px;
   }
 }
 </style>
