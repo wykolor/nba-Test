@@ -8,6 +8,8 @@ let getAllianceUrl = "/nba/company/list";
 let addAllianceUrl = "/nba/company/add";
 // 修改联盟
 let updateAllianceUrl = "/nba/company/update";
+// 删除联盟
+let deleteAllianceUrl = "/nba/company/delete";
 export default {
     getAllianceAddress: function (getAllianceObj) {
         return get(getAllianceUrl, getAllianceObj)
@@ -18,4 +20,7 @@ export default {
     updateAllianceAddress: function (updateAllianceObj) {
         return post(updateAllianceUrl, updateAllianceObj)
     },
+    deleteAllianceAddress: function (deleteAllianceObj) {
+        return post(deleteAllianceUrl, deleteAllianceObj)
+    }
 }

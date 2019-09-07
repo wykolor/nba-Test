@@ -21,7 +21,10 @@
               class="image"
             />
             <div style="padding: 14px 0;text-align:center">
-              <span style="font-size:20px;font-weight: bold;">{{item.allianceName}}</span>
+              <div class="bottom" style="margin:0">
+                <span style="font-size:20px;font-weight: bold;">{{item.allianceName}}</span>
+                <el-tag type="danger" @click="delAlliance(item.id)">删除</el-tag>
+              </div>
               <div class="bottom">
                 <el-tag @click="goTeam(item.id)">球队</el-tag>
                 <el-tag type="success" @click="goGame(item.id)">比赛</el-tag>
@@ -57,7 +60,7 @@ export default {
     allianceLists() {
       this.$server.allianceApi
         .getAllianceAddress({
-          pageSize: 10,
+          pageSize: 20,
           pageIndex: 1,
           companyName: this.searchValue
         })
@@ -132,6 +135,31 @@ export default {
           this.$message({
             type: "info",
             message: "取消更新联盟"
+          });
+        });
+    },
+    // 删除联盟
+    delAlliance(id) {
+      this.$confirm("此操作将永久删除该比赛, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$server.allianceApi.deleteAllianceAddress({ id }).then(res => {
+            if (res.code == 200) {
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+              this.allianceLists();
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
           });
         });
     },

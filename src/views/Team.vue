@@ -1,18 +1,18 @@
 <template>
   <div class="team">
     <div class="team-header">
-      <el-button type="Info" icon="el-icon-plus" @click="openPopup">添加球队</el-button>
-      <el-dialog title="添加球队" :visible.sync="dialogFormVisible">
+      <el-button type="Info" icon="el-icon-plus" @click="openPopup('添加球队')">添加球队</el-button>
+      <el-dialog :title="popupTitle" :visible.sync="dialogFormVisible">
         <el-form :model="form">
           <el-form-item label="球队名称" :label-width="formLabelWidth">
             <el-input v-model="form.teamName" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="所属联盟" :label-width="formLabelWidth">
-            <el-select v-model="form.commpanyId" placeholder="请选择所属联盟">
+            <el-select v-model="form.allianceName" placeholder="请选择所属联盟">
               <!-- 遍历联盟 -->
               <el-option
                 :label="item.allianceName"
-                :value="item.id"
+                :value="item.allianceName"
                 v-for="item in form.allianceList"
                 :key="item.id"
               ></el-option>
@@ -21,7 +21,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addTeam">确 定</el-button>
+          <el-button type="primary" @click="addUpdate(form.allianceId)">确 定</el-button>
         </div>
       </el-dialog>
       <section>
@@ -45,7 +45,8 @@
               >{{item.allianceName}}</span>
               <div class="bottom">
                 <el-tag type="success">比赛</el-tag>
-                <el-tag type="warning">更新球队</el-tag>
+                <el-tag type="warning" @click="openPopup('修改球队',item.id)">更新球队</el-tag>
+                <el-tag type="danger" @click="delTeam(item.id)">删除</el-tag>
               </div>
             </div>
           </el-card>
@@ -64,12 +65,14 @@ export default {
       dialogFormVisible: false, //隐藏弹框
       form: {
         teamName: "",
-        commpanyId: "",
-        delivery: false,
+        id: "",
+        allianceId: "",
+        allianceName: "",
         allianceList: this.$store.getters.allianceList
       },
       formLabelWidth: "120px",
-      loading: true
+      loading: true,
+      popupTitle: "添加球队"
     };
   },
   created() {
@@ -82,7 +85,7 @@ export default {
       let allianceId = id ? id : "";
       this.$server.teamApi
         .getTeamAddress({
-          pageSize: 10,
+          pageSize: 20,
           pageIndex: 1,
           teamName: this.searchValue,
           allianceId
@@ -119,16 +122,49 @@ export default {
       this.teamList();
     },
     // 打开弹出窗
-    openPopup() {
+    openPopup(title, id) {
       this.dialogFormVisible = true;
-      // this.getAlliance();
+      this.popupTitle = title;
+      if (!id) {
+        return false;
+      } else {
+        // 回显数据
+        this.$server.teamApi
+          .updateTeamDataAddress({
+            id
+          })
+          .then(res => {
+            if (res.code == 200) {
+              let { allianceName, allianceId, teamName, id } = res.data;
+              this.form.allianceName = allianceName;
+              this.form.allianceId = allianceId;
+              this.form.teamName = teamName;
+              this.form.id = id;
+            }
+          });
+      }
     },
-    // 真正的添加球队业务逻辑
+    // 增加更新
+    addUpdate() {
+      this.form.allianceList.forEach(item => {
+        if (this.form.allianceName == item.allianceName) {
+          this.form.allianceId = item.id;
+          if (!this.form.id) {
+            this.addTeam();
+            return false;
+          } else {
+            this.updateTeam();
+            return false;
+          }
+        }
+      });
+    },
+    // 添加球队
     addTeam() {
       this.$server.teamApi
         .addTeamAddress({
           teamName: this.form.teamName,
-          allianceId: this.form.commpanyId
+          allianceId: this.form.allianceId
         })
         .then(res => {
           if (res.code == 200) {
@@ -139,6 +175,50 @@ export default {
             this.dialogFormVisible = false; //关闭弹出
             this.teamList();
           }
+        });
+    },
+    // 更新球队
+    updateTeam() {
+      let { id, allianceId, teamName } = this.form;
+      this.$server.teamApi
+        .updateTeamAddress({
+          id,
+          allianceId,
+          teamName
+        })
+        .then(res => {
+          if (res.code == 200) {
+            this.$message({
+              type: "success",
+              message: "修改球队成功"
+            });
+            this.dialogFormVisible = false; //关闭弹出
+            this.teamList();
+          }
+        });
+    },
+    delTeam(id) {
+      this.$confirm("此操作将永久删除该球队, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$server.teamApi.deleteTeamAddress({ id }).then(res => {
+            if (res.code == 200) {
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+              this.teamList();
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
         });
     }
   }

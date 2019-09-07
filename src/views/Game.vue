@@ -48,7 +48,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="addShow = false">取 消</el-button>
-          <el-button type="primary" @click="addShow = false">确 定</el-button>
+          <el-button type="primary" @click="addGame">确 定</el-button>
         </div>
       </el-dialog>
       <section>
@@ -78,7 +78,7 @@
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -145,11 +145,45 @@ export default {
     openPopup() {
       this.addShow = true;
     },
+    addGame() {
+      let params = { ...this.ruleForm };
+      this.$server.gameApi.addGameAddress(params).then(res => {
+        if (res.code == 200) {
+          this.$message({
+            type: "success",
+            message: "添加比赛成功"
+          });
+          this.addShow = false;
+          this.gameList();
+        }
+      });
+    },
     handleEdit(row) {
       console.log(row);
     },
-    handleDelete(row) {
-      console.log(row);
+    handleDelete(id) {
+      this.$confirm("此操作将永久删除该比赛, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$server.gameApi.deleteGameAddress({ id }).then(res => {
+            if (res.code == 200) {
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+              this.gameList();
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
 };

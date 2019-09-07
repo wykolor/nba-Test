@@ -8,6 +8,8 @@ let getGameUrl = '/nba/game/list';
 let addGameUrl = '/nba/game/add';
 // 修改比赛
 let updateGameUrl = '/nba/game/update';
+// 删除比赛
+let deleteGameUrl = '/nba/game/delete';
 export default {
     getGameAddress: function (getGameObj) {
         return get(getGameUrl, getGameObj)
@@ -17,5 +19,8 @@ export default {
     },
     updateGameAddress: function (updateGameObj) {
         return post(updateGameUrl, updateGameObj)
+    },
+    deleteGameAddress: function (deleteGameObj) {
+        return post(deleteGameUrl, deleteGameObj)
     }
 }
