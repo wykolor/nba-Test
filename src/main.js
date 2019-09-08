@@ -8,7 +8,8 @@ import router from './router'
 import server from './http/api.js'
 //定义全局变量
 Vue.prototype.$server = server;
-
+let echarts = require("echarts/lib/echarts");
+Vue.prototype.$echarts = echarts;
 // 解决跨域的准备
 // 不是生产环境
 Vue.config.productionTip = false;

@@ -10,6 +10,8 @@ let addAllianceUrl = "/nba/company/add";
 let updateAllianceUrl = "/nba/company/update";
 // 删除联盟
 let deleteAllianceUrl = "/nba/company/delete";
+// 联盟下的比赛比分
+let scoreEchartsUrl = "/nba/echarts/echartsByScore"
 export default {
     getAllianceAddress: function (getAllianceObj) {
         return get(getAllianceUrl, getAllianceObj)
@@ -22,5 +24,8 @@ export default {
     },
     deleteAllianceAddress: function (deleteAllianceObj) {
         return post(deleteAllianceUrl, deleteAllianceObj)
+    },
+    scoreEchartsAddress: function (scoreEchartsObj) {
+        return get(scoreEchartsUrl, scoreEchartsObj)
     }
 }
