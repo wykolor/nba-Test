@@ -23,7 +23,7 @@
         <router-view></router-view>
       </div>
 
-      <el-footer>@CopyRight &copy;2019-present WY-KOLOR</el-footer>
+      <!-- <el-footer>@CopyRight &copy;2019-present WY-KOLOR</el-footer> -->
     </el-container>
   </div>
 </template>

@@ -11,6 +11,9 @@ require("echarts/lib/chart/pie");
 // 引入提示框和标题组件
 require("echarts/lib/component/tooltip");
 require("echarts/lib/component/title");
+require("echarts/lib/component/legend");
+require("echarts/lib/component/markLine");
+import "echarts/lib/component/legendScroll";
 export default {
   data() {
     return {
@@ -80,11 +83,8 @@ export default {
           formatter: "{a} <br/>{b} : {c} ({d}%)"
         },
         legend: {
-          type: "scroll",
-          orient: "vertical",
-          right: 10,
-          top: 20,
-          bottom: 20,
+          bottom: 10,
+          left: "center",
           data: this.allianceScore,
 
           selected: this.allianceScore
@@ -94,7 +94,7 @@ export default {
             name: "比分",
             type: "pie",
             radius: "55%",
-            center: ["40%", "50%"],
+            center: ["50%", "40%"],
             data: this.allianceScore,
             itemStyle: {
               emphasis: {
@@ -117,11 +117,8 @@ export default {
           formatter: "{a} <br/>{b} : {c} ({d}%)"
         },
         legend: {
-          type: "scroll",
-          orient: "vertical",
-          right: 10,
-          top: 20,
-          bottom: 20,
+          bottom: 10,
+          left: "center",
           data: this.scoreFirst,
 
           selected: this.scoreFirst
@@ -131,7 +128,7 @@ export default {
             name: "比分",
             type: "pie",
             radius: "55%",
-            center: ["40%", "50%"],
+            center: ["50%", "40%"],
             data: this.scoreFirst,
             itemStyle: {
               emphasis: {
@@ -154,11 +151,8 @@ export default {
           formatter: "{a} <br/>{b} : {c} ({d}%)"
         },
         legend: {
-          type: "scroll",
-          orient: "vertical",
-          right: 10,
-          top: 20,
-          bottom: 20,
+          bottom: 10,
+          left: "center",
           data: this.scoreSecond,
 
           selected: this.scoreSecond
@@ -168,7 +162,7 @@ export default {
             name: "比分",
             type: "pie",
             radius: "55%",
-            center: ["40%", "50%"],
+            center: ["50%", "40%"],
             data: this.scoreSecond,
             itemStyle: {
               emphasis: {
@@ -194,10 +188,11 @@ export default {
   width: 100%;
   box-sizing: border-box;
   display: flex;
-  // margin: 50px 0;
-  padding: 50px;
+  padding: 50px 0px;
+  justify-content: space-around;
+  text-align: center;
   .echarts-score {
-    flex: 1;
+    width: 33%;
     height: 500px;
     box-sizing: border-box;
   }
