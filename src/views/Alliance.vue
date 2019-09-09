@@ -14,7 +14,12 @@
     </div>
     <div class="ali-list" v-loading="loading">
       <el-row :gutter="20">
-        <el-col :span="4" v-for="item in allianceList" :key="item.id">
+        <el-col
+          :span="4"
+          v-for="item in allianceList"
+          :key="item.id"
+          @click.native="goEcharts(item.allianceName)"
+        >
           <el-card :body-style="{ padding: '0px' }" shadow="hover">
             <img
               src="https://australia.basketball/wp-content/uploads/2018/09/OgImage_en.png"
@@ -23,12 +28,12 @@
             <div style="padding: 14px 0;text-align:center">
               <div class="bottom" style="margin:0">
                 <span style="font-size:20px;font-weight: bold;">{{item.allianceName}}</span>
-                <el-tag type="danger" @click="delAlliance(item.id)">删除</el-tag>
+                <el-tag type="danger" @click.stop="delAlliance(item.id)">删除</el-tag>
               </div>
               <div class="bottom">
-                <el-tag @click="goTeam(item.id)">球队</el-tag>
-                <el-tag type="success" @click="goGame(item.id)">比赛</el-tag>
-                <el-tag type="warning" @click="updateAlliance(item.allianceName,item.id)">更新联盟</el-tag>
+                <el-tag @click.stop="goTeam(item.id)">球队</el-tag>
+                <el-tag type="success" @click.stop="goGame(item.id)">比赛</el-tag>
+                <el-tag type="warning" @click.stop="updateAlliance(item.allianceName,item.id)">更新联盟</el-tag>
               </div>
             </div>
           </el-card>
@@ -70,7 +75,9 @@ export default {
     this.getAlliance();
   },
   methods: {
-    
+    goEcharts(allianceName) {
+      this.$router.push(`/allianceEcharts/${allianceName}`);
+    },
     allianceLists() {
       this.$server.allianceApi
         .getAllianceAddress({

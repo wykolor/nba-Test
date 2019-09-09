@@ -38,7 +38,7 @@ const router = new Router({
                 component: Game
             },
             {
-                path: 'allianceEcharts',
+                path: 'allianceEcharts/:allianceName',
                 component: AllianceEcharts
             }
         ]

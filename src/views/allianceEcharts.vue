@@ -8,7 +8,9 @@
 require("echarts/lib/chart/pie");
 export default {
   data() {
-    return {};
+    return {
+      allianceScore: []
+    };
   },
   created() {
     this.getScore();
@@ -16,12 +18,17 @@ export default {
   methods: {
     // 获取 联盟下的比分统计
     getScore() {
+      let allianceName = this.$route.params.allianceName;
       this.$server.allianceApi
         .scoreEchartsAddress({
-          allianceName: "CBA"
+          allianceName
         })
         .then(res => {
           if (res.code == 200) {
+            this.allianceScore = res.data;
+            this.$nextTick(() => {
+              this.drawChart();
+            });
           }
         });
     },
@@ -55,10 +62,9 @@ export default {
           repeat: "repeat"
         },
         title: {
-          text: "饼图纹理",
-          textStyle: {
-            color: "#235894"
-          }
+          text: "天气情况统计",
+          subtext: "虚构数据",
+          left: "center"
         },
         tooltip: {},
         series: [
@@ -83,13 +89,14 @@ export default {
                 }
               }
             },
-            data: [
-              { value: 335, name: "双双双双" },
-              { value: 310, name: "单单单单" },
-              { value: 234, name: "单双单双" },
-              { value: 135, name: "双双单单" },
-              { value: 1548, name: "双单双单" }
-            ],
+            data: this.allianceScore,
+            // data: [
+            //   { value: 335, name: "双双双双" },
+            //   { value: 310, name: "单单单单" },
+            //   { value: 234, name: "单双单双" },
+            //   { value: 135, name: "双双单单" },
+            //   { value: 1548, name: "双单双单" }
+            // ],
             itemStyle: itemStyle
           }
         ]
@@ -98,9 +105,6 @@ export default {
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
     }
-  },
-  mounted() {
-    this.drawChart();
   }
 };
 </script>
@@ -111,7 +115,7 @@ export default {
   box-sizing: border-box;
   #scoreShow {
     width: 100%;
-    height: 500px;
+    height: 600px;
     box-sizing: border-box;
   }
 }
