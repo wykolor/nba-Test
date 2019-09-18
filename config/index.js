@@ -11,7 +11,7 @@ module.exports = {
         proxyTable: {
             // axios处理跨域问题
             '/api': {
-                target: "http://192.168.3.12:8085", //生产环境
+                target: "http://localhost:8085", //生产环境
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': '/'

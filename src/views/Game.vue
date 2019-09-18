@@ -35,14 +35,14 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="比赛时间">
+          <!-- <el-form-item label="比赛时间">
             <el-date-picker
               type="date"
               placeholder="选择日期"
               v-model="ruleForm.gameTime"
               style="width: 100%;"
             ></el-date-picker>
-          </el-form-item>
+          </el-form-item>-->
           <el-form-item label="第一节比分">
             <el-input v-model="ruleForm.firstScore"></el-input>
           </el-form-item>
@@ -132,8 +132,8 @@ export default {
         thirdScore: "",
         forthScore: "",
         allScore: "",
-        gameTime: "",
         id: ""
+        // gameTime: "",
       },
       rules: {
         keTeamId: [{ required: true, message: "必填内容", trigger: "change" }]
@@ -221,6 +221,7 @@ export default {
         }
       });
     },
+    // 更新比赛
     updateGame() {
       let params = { ...this.ruleForm };
       this.$server.gameApi.updateGameAddress(params).then(res => {
