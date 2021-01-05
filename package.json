@@ -12,7 +12,7 @@
     "build:test": "node build/test.js"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "better-scroll": "^2.0.0-alpha.15",
     "cube-ui": "^1.12.27",
     "echarts": "^4.2.1",
